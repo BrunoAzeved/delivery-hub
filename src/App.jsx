@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './features/delivery/Dashboard';
 import ChatAgent from './features/chat/ChatAgent';
+import AttentionCenter from './features/delivery/AttentionCenter';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -13,6 +14,8 @@ function AppContent() {
     switch (activeTab) {
       case 'delivery':
         return <Dashboard />;
+      case 'attention':
+        return <AttentionCenter />;
       case 'chat':
         return <ChatAgent />;
       case 'analytics':

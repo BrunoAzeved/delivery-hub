@@ -36,38 +36,89 @@ async function startServer() {
   // Jira Integration Route
   app.get('/api/delivery/board', authMiddleware, async (req, res) => {
     try {
-      // Simulation of Jira Data
-      // In production, use axios to fetch from Atlassian API
+      // Simulation of Jira Data with Epics (PD) and Stories/Tasks (DAAS)
       const mockJiraData = [
         {
-          id: 'DH-101',
-          summary: 'Implement MCP Server for Jira',
+          id: 'PD-1',
+          summary: 'Plataforma de Dados 2026',
           status: 'In Progress',
-          targetStart: '2026-04-01',
-          targetEnd: '2026-04-10',
-          dueDate: '2026-04-12',
+          type: 'Epic',
+          project: 'PD',
+          targetStart: '2026-01-01',
+          targetEnd: '2026-12-31',
+          dueDate: '2026-12-31',
           lastUpdate: '2026-04-08',
           assignee: 'Alice',
+          tags: [],
+          children: [
+            {
+              id: 'DAAS-101',
+              summary: 'Implement MCP Server for Jira',
+              status: 'In Progress',
+              type: 'Story',
+              project: 'DAAS',
+              targetStart: '2026-04-01',
+              targetEnd: '2026-04-10',
+              dueDate: '2026-04-12',
+              lastUpdate: '2026-04-08',
+              assignee: 'Alice',
+              tags: ['daas_datahunting'],
+            },
+            {
+              id: 'DAAS-102',
+              summary: 'Setup Databricks SQL Warehouse',
+              status: 'To Do',
+              type: 'Task',
+              project: 'DAAS',
+              targetStart: '2026-04-05',
+              targetEnd: '2026-04-15',
+              dueDate: '2026-04-20',
+              lastUpdate: '2026-04-01',
+              assignee: 'Bob',
+              tags: ['daas_datalab'],
+            },
+            {
+              id: 'DAAS-104',
+              summary: 'Refactor Data Pipeline',
+              status: 'In Progress',
+              type: 'Story',
+              project: 'DAAS',
+              targetStart: '2026-04-01',
+              targetEnd: '2026-04-25',
+              dueDate: '2026-04-30',
+              lastUpdate: '2026-04-05', // Warning: 4 days ago (Today is April 9)
+              assignee: 'Alice',
+              tags: ['daas_datahunting'],
+            }
+          ]
         },
         {
-          id: 'DH-102',
-          summary: 'Setup Databricks SQL Warehouse',
-          status: 'To Do',
-          targetStart: '2026-04-05',
-          targetEnd: '2026-04-15',
-          dueDate: '2026-04-20',
-          lastUpdate: '2026-04-01', // Alert: > 3 days
-          assignee: 'Bob',
-        },
-        {
-          id: 'DH-103',
-          summary: 'Design OKR Module',
+          id: 'PD-2',
+          summary: 'Expansão Analytics',
           status: 'Backlog',
+          type: 'Epic',
+          project: 'PD',
           targetStart: '2026-05-01',
-          targetEnd: '2026-05-30',
-          dueDate: '2026-06-01',
+          targetEnd: '2026-08-30',
+          dueDate: '2026-09-01',
           lastUpdate: '2026-04-09',
           assignee: 'Charlie',
+          tags: [],
+          children: [
+            {
+              id: 'DAAS-103',
+              summary: 'Design OKR Module',
+              status: 'Backlog',
+              type: 'Story',
+              project: 'DAAS',
+              targetStart: '2026-05-01',
+              targetEnd: '2026-05-30',
+              dueDate: '2026-06-01',
+              lastUpdate: '2026-04-09',
+              assignee: 'Charlie',
+              tags: ['daas_datahunting'],
+            }
+          ]
         }
       ];
       res.json(mockJiraData);

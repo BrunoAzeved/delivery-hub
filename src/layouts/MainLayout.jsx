@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, MessageSquare, PieChart, Settings, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, PieChart, Settings, LogOut, User, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ export default function MainLayout({ children, activeTab, setActiveTab }) {
 
   const navItems = [
     { id: 'delivery', label: 'Delivery Hub', icon: LayoutDashboard },
+    { id: 'attention', label: 'Central de Atenção', icon: AlertCircle },
     { id: 'chat', label: 'AI Agent (MCP)', icon: MessageSquare },
     { id: 'analytics', label: 'Analytics', icon: PieChart },
     { id: 'settings', label: 'Settings', icon: Settings },
