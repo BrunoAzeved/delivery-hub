@@ -50,6 +50,11 @@ async function startServer() {
           lastUpdate: '2026-04-08',
           assignee: 'Alice',
           tags: [],
+          description: 'Projeto estratégico para migração da infraestrutura legada para Databricks e modernização do data lake.',
+          comments: [
+            { author: 'Alice', text: 'Iniciamos a fase de mapeamento de dependências.', date: '2026-04-01' },
+            { author: 'Bob', text: 'Aguardando liberação de acessos no ambiente de staging.', date: '2026-04-05' }
+          ],
           children: [
             {
               id: 'DAAS-101',
@@ -63,6 +68,11 @@ async function startServer() {
               lastUpdate: '2026-04-08',
               assignee: 'Alice',
               tags: ['daas_datahunting'],
+              description: 'Desenvolvimento de um servidor MCP para integração direta com a API do Jira Cloud.',
+              comments: [
+                { author: 'Alice', text: 'Auth flow implementado com sucesso.', date: '2026-04-05' },
+                { author: 'Charlie', text: 'Precisamos validar os limites de rate limit da API.', date: '2026-04-08' }
+              ]
             },
             {
               id: 'DAAS-102',
@@ -76,6 +86,10 @@ async function startServer() {
               lastUpdate: '2026-04-01',
               assignee: 'Bob',
               tags: ['daas_datalab'],
+              description: 'Configuração dos clusters de SQL Warehouse para consumo do time de Analytics.',
+              comments: [
+                { author: 'Bob', text: 'Aguardando aprovação do orçamento de infra.', date: '2026-04-01' }
+              ]
             },
             {
               id: 'DAAS-104',
@@ -89,6 +103,11 @@ async function startServer() {
               lastUpdate: '2026-04-05', // Warning: 4 days ago (Today is April 9)
               assignee: 'Alice',
               tags: ['daas_datahunting'],
+              description: 'Otimização dos jobs de ingestão para reduzir o tempo de processamento em 30%.',
+              comments: [
+                { author: 'Alice', text: 'Iniciamos o profiling dos jobs atuais.', date: '2026-04-01' },
+                { author: 'Alice', text: 'Identificamos gargalo no step de deduplicação.', date: '2026-04-05' }
+              ]
             }
           ]
         },
@@ -104,6 +123,8 @@ async function startServer() {
           lastUpdate: '2026-04-09',
           assignee: 'Charlie',
           tags: [],
+          description: 'Fase 2 do projeto de Analytics focada em modelos preditivos.',
+          comments: [],
           children: [
             {
               id: 'DAAS-103',
@@ -117,6 +138,8 @@ async function startServer() {
               lastUpdate: '2026-04-09',
               assignee: 'Charlie',
               tags: ['daas_datahunting'],
+              description: 'Desenho da interface e fluxo de dados para o novo módulo de OKRs.',
+              comments: []
             }
           ]
         }

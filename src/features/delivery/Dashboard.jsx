@@ -23,11 +23,15 @@ import {
   Tags,
   Search,
   Filter,
-  X
+  X,
+  Sparkles,
+  Send,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { userSettings } from '../../config/userSettings';
 import { Input } from '@/components/ui/input';
+import { summarizeTask, refineComment } from '../../services/geminiService';
 
 export default function Dashboard() {
   const [epics, setEpics] = useState([]);
@@ -40,6 +44,10 @@ export default function Dashboard() {
     status: 'all',
     search: ''
   });
+
+  // AI States
+  const [aiSummary, setAiSummary] = useState({ open: false, content: '', loading: false, task: null });
+  const [aiComment, setAiComment] = useState({ open: false, original: '', refined: '', loading: false, task: null, confirmed: false });
 
   useEffect(() => {
     fetch('/api/delivery/board')
@@ -200,6 +208,25 @@ export default function Dashboard() {
     return [];
   };
 
+  const handleCheckStatus = async (task) => {
+    setAiSummary({ open: true, content: '', loading: true, task });
+    const summary = await summarizeTask(task);
+    setAiSummary(prev => ({ ...prev, content: summary, loading: false }));
+  };
+
+  const handleRefineComment = async () => {
+    setAiComment(prev => ({ ...prev, loading: true, refined: '' }));
+    const refined = await refineComment(aiComment.original);
+    setAiComment(prev => ({ ...prev, refined, loading: false }));
+  };
+
+  const handlePostComment = (task) => {
+    // Simulated MCP call
+    console.log(`Publishing to Jira via MCP: ${aiComment.refined} on task ${task.id}`);
+    setAiComment({ open: false, original: '', refined: '', loading: false, task: null, confirmed: false });
+    alert(`Comentário publicado no Jira (${task.id}) via MCP!`);
+  };
+
   const renderTaskRow = (task, isChild = false) => (
     <TableRow key={task.id} className={`${getRowColor(task)} ${isChild ? 'bg-neutral-50/30' : ''}`}>
       <TableCell className="font-mono text-[10px] font-bold">
@@ -237,7 +264,22 @@ export default function Dashboard() {
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-1">
-          <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-black">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+            onClick={(e) => { e.stopPropagation(); handleCheckStatus(task); }}
+            title="Verificar Status com IA"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-7 w-7 text-neutral-400 hover:text-black"
+            onClick={(e) => { e.stopPropagation(); setAiComment({ ...aiComment, open: true, task }); }}
+            title="Adicionar Comentário"
+          >
             <MessageSquarePlus className="w-3.5 h-3.5" />
           </Button>
           <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-black">
@@ -489,7 +531,22 @@ export default function Dashboard() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-black">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                              onClick={(e) => { e.stopPropagation(); handleCheckStatus(epic); }}
+                              title="Verificar Status com IA"
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-7 w-7 text-neutral-400 hover:text-black"
+                              onClick={(e) => { e.stopPropagation(); setAiComment({ ...aiComment, open: true, task: epic }); }}
+                              title="Adicionar Comentário"
+                            >
                               <MessageSquarePlus className="w-3.5 h-3.5" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-7 w-7 text-neutral-400 hover:text-black">
@@ -509,6 +566,127 @@ export default function Dashboard() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* AI Summary Modal */}
+      <AnimatePresence>
+        {aiSummary.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
+            >
+              <div className="p-6 border-b border-neutral-100 flex items-center justify-between bg-blue-50/50">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-bold text-neutral-900">Resumo de Status (IA)</h3>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setAiSummary({ ...aiSummary, open: false })} className="h-8 w-8">
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="font-mono">{aiSummary.task?.id}</Badge>
+                  <span className="font-semibold text-sm">{aiSummary.task?.summary}</span>
+                </div>
+                
+                <div className="bg-neutral-50 rounded-lg p-4 min-h-[100px] flex items-center justify-center">
+                  {aiSummary.loading ? (
+                    <div className="flex flex-col items-center gap-2 text-neutral-400">
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <span className="text-xs font-medium">Analisando descrição e comentários...</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm leading-relaxed text-neutral-700 italic">
+                      "{aiSummary.content}"
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="p-4 bg-neutral-50 border-t border-neutral-100 flex justify-end">
+                <Button onClick={() => setAiSummary({ ...aiSummary, open: false })} className="bg-black text-white hover:bg-neutral-800">
+                  Fechar
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* AI Comment Modal */}
+      <AnimatePresence>
+        {aiComment.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
+            >
+              <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageSquarePlus className="w-5 h-5 text-neutral-900" />
+                  <h3 className="font-bold text-neutral-900">Adicionar Comentário</h3>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setAiComment({ ...aiComment, open: false })} className="h-8 w-8">
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold uppercase text-neutral-400">Seu rascunho</label>
+                  <textarea 
+                    className="w-full h-24 p-3 text-sm border border-neutral-200 rounded-lg focus:ring-2 focus:ring-black outline-none resize-none"
+                    placeholder="Escreva o que aconteceu..."
+                    value={aiComment.original}
+                    onChange={(e) => setAiComment({ ...aiComment, original: e.target.value })}
+                  />
+                </div>
+
+                {aiComment.refined && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="space-y-2"
+                  >
+                    <label className="text-[10px] font-bold uppercase text-blue-500 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> Sugestão da IA
+                    </label>
+                    <div className="w-full p-3 text-sm bg-blue-50 border border-blue-100 rounded-lg text-blue-900 italic">
+                      {aiComment.refined}
+                    </div>
+                  </motion.div>
+                )}
+
+                {aiComment.loading && (
+                  <div className="flex items-center gap-2 text-blue-600 text-xs font-medium py-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Refinando sua mensagem...
+                  </div>
+                )}
+              </div>
+              <div className="p-4 bg-neutral-50 border-t border-neutral-100 flex justify-between gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={handleRefineComment}
+                  disabled={!aiComment.original || aiComment.loading}
+                  className="flex-1 gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+                >
+                  <Sparkles className="w-4 h-4" /> Refinar com IA
+                </Button>
+                <Button 
+                  onClick={() => handlePostComment(aiComment.task)}
+                  disabled={!aiComment.refined || aiComment.loading}
+                  className="flex-1 gap-2 bg-black text-white hover:bg-neutral-800"
+                >
+                  <Send className="w-4 h-4" /> Publicar no Jira
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Future Roadmap Preview */}
       <div className="p-6 border border-dashed border-neutral-200 rounded-xl bg-neutral-50/30">
