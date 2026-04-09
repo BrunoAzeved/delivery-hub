@@ -1,0 +1,5 @@
+{
+  "name": "Delivery Hub",
+  "description": "Enterprise-ready delivery management system with Jira integration, MCP-powered chat agent, and Databricks analytics.",
+  "requestFramePermissions": []
+}
