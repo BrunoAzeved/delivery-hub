@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import Dashboard from './features/delivery/Dashboard';
 import ChatAgent from './features/chat/ChatAgent';
 import AttentionCenter from './features/delivery/AttentionCenter';
+import Analytics from './features/analytics/Analytics';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -19,22 +20,7 @@ function AppContent() {
       case 'chat':
         return <ChatAgent />;
       case 'analytics':
-        return (
-          <div className="space-y-6">
-            <Card className="border-neutral-200">
-              <CardHeader>
-                <CardTitle>Databricks Analytics</CardTitle>
-                <CardDescription>Historical performance and delivery trends</CardDescription>
-              </CardHeader>
-              <CardContent className="h-96 flex items-center justify-center border-t border-neutral-100 bg-neutral-50/30">
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-neutral-200 rounded-full mx-auto animate-pulse"></div>
-                  <p className="text-sm font-medium text-neutral-500">Connecting to Databricks SQL Warehouse...</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
+        return <Analytics />;
       case 'settings':
         const hasApiKey = !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MY_GEMINI_API_KEY';
         return (
